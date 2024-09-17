@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Upload</title>
+    <script>
+        async function uploadCsv() {
+            const fileInput = document.getElementById('file');
+            if (fileInput.files.length <= 0) {
+                alert("Please select a file!");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            await fetch('./api/csv/upload', {
+                method: 'POST',
+                body: formData
+            });
+            alert("File uploaded successfully");
+        }
+        async function fetchData() {
+            const response = await fetch('./api/csv');
+            const data = await response.json();
+            const dataDisplay = document.getElementById('dataDisplay');
+            dataDisplay.innerHTML = JSON.stringify(data, null, 2);
+        }
+        async function fetchDataByCode() {
+            const codeInput = document.getElementById('codeInput').value;
+            const response = await fetch(`./api/csv/${codeInput}`);
+            if (response.ok) {
+                const data = await response.json();
+                const dataDisplay = document.getElementById('dataDisplay');
+                dataDisplay.innerHTML = JSON.stringify(data, null, 2);
+            } else {
+                alert("No data found for the provided code");
+            }
+        }
+        async function deleteData() {
+            await fetch('./api/csv', { method: 'DELETE' });
+            alert("All data deleted");
+        }  
+    </script>
+</head>
+
+<body>
+    <h1>CSV Upload</h1>
+    <input type="file" id="file">
+    <button onclick="uploadCsv()">Upload CSV</button>
+    <hr>
+    <button onclick="fetchData()">Fetch All Data</button>
+    <input type="text" id="codeInput" placeholder="Enter Code">
+    <button onclick="fetchDataByCode()">Fetch Data by Code</button>
+    <button onclick="deleteData()">Delete All Data</button>
+    <pre id="dataDisplay"></pre>
+</body>
+
+</html>
